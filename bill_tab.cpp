@@ -1,3 +1,5 @@
+// ---- MainWindow.h function definition for Bill Tab ----
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -11,11 +13,10 @@
 #include <QSettings>
 
 
-
 void MainWindow::updateBillTable()
 {
 
-    QVector<Bill_Item> billItems = manager.Get_Bill_list();
+    QVector<BillItem> billItems = manager.Get_Bill_list();
     ui->billOutputTableWidget->setRowCount(billItems.size());
 
     for (int i = 0; i < billItems.size(); ++i) {
@@ -55,15 +56,13 @@ void MainWindow::updateBillTable()
 
 }
 
-
-
 void MainWindow::on_BillItemClicked(int row) {
 
     qDebug()<<"Bill Item clicked";
 
     if (row < 0 || row >= manager.Get_Bill_list().size()) return; // Safety check
 
-    const Bill_Item& selectedItem = manager.Get_Bill_list().at(row);  // Get selected item
+    const BillItem& selectedItem = manager.Get_Bill_list().at(row);  // Get selected item
     int itemId = selectedItem.getID();
     QString itemName = selectedItem.getName();
 
@@ -81,7 +80,6 @@ void MainWindow::on_BillItemClicked(int row) {
         ui->billTotalLabel->setText("Total: " + QString::number(total, 'f', 2)); // Display with 2 decimal places
     }
 }
-
 
 void MainWindow::on_cleanBillButton_clicked()
 {
@@ -101,15 +99,12 @@ void MainWindow::on_cleanBillButton_clicked()
 
 }
 
-
-
 void MainWindow::on_getTheBillButton_clicked()
 {
     if (manager.Get_Bill_list().size() != 0) {
         showCustomerDialog(); // Open the dialog for customer name
     }
 }
-
 
 void MainWindow::showCustomerDialog()
 {
@@ -150,7 +145,6 @@ void MainWindow::showCustomerDialog()
     dialog.exec();
 }
 
-
 void MainWindow::processBill()
 {
     qDebug() << "Processing bill for: " << manager.getCustomerName();
@@ -168,7 +162,7 @@ void MainWindow::processBill()
     manager.save_data();
 
     // Reset the manager object
-    manager = Bill_manager();  // Recreate manager (clear bill)
+    manager = BillManager();  // Recreate manager (clear bill)
     QSettings settings("HashikaCompany", "Billify");
     manager.setSaveDirectory( settings.value("saveDirectory", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString() );
 

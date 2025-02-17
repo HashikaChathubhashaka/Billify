@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class inventory_manager {
+class InventoryManager {
 
 protected:
 
@@ -20,8 +20,8 @@ protected:
 
 public:
 
-    inventory_manager(); // When making inventory manager object, data are load.
-    ~inventory_manager();
+     InventoryManager(); // When making inventory manager object, data are load.
+    ~InventoryManager();
 
 
     // load and save data to CSV file
@@ -48,9 +48,6 @@ public:
 
     //Setters
     void setloadDirectory();
-
-
-
 
 
 };

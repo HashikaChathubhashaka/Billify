@@ -1,3 +1,6 @@
+// ---MainWindow.h function definition for Inventory table ---
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -9,9 +12,6 @@
 #include <QStandardPaths>
 #include <QDesktopServices>
 #include <QSettings>
-
-
-
 
 
 void MainWindow::filterItems()

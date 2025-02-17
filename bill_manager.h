@@ -7,10 +7,10 @@
 #include <QString>
 #include <QDebug>
 
-class Bill_manager : public inventory_manager {
+class BillManager : public InventoryManager {
 
 private:
-    QVector<Bill_Item> m_bill_items; // To store the each bill Item
+    QVector<BillItem> m_bill_items; // To store the each bill Item
 
     double total_price{ 0 }; // total price of the bill
     QString customer_name;
@@ -19,7 +19,7 @@ private:
 
 public:
 
-    Bill_manager();
+    BillManager();
 
     //setters
     void setCustomerName(QString name);
@@ -29,7 +29,7 @@ public:
     //getters
     QString getSaveDirectory() const;
     QString getCustomerName();
-    QVector <Bill_Item> Get_Bill_list(); // to get the items in the bill list
+    QVector <BillItem> Get_Bill_list(); // to get the items in the bill list
     QString getShopName();
 
     // Bill Functionalities

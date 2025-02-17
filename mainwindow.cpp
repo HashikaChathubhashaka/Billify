@@ -1,3 +1,6 @@
+// ---MainWindow.h menubar Functions and other function defintions ---
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -12,6 +15,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QTabWidget>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -127,7 +131,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
 void MainWindow::openSaveLocation() {
     QString saveDirectory = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     if (! manager.getSaveDirectory().isEmpty()) {
@@ -136,7 +139,6 @@ void MainWindow::openSaveLocation() {
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(saveDirectory));
 }
-
 
 void MainWindow::setSaveLocation() {
     QString dir = QFileDialog::getExistingDirectory(this, "Select Save Location",
@@ -151,7 +153,6 @@ void MainWindow::setSaveLocation() {
     QSettings settings("HashikaCompany", "Billify");
     settings.setValue("saveDirectory", dir);
 }
-
 
 void MainWindow::changeBillName() {
     // Step 1: Ask for the new bill name using a dialog
@@ -245,10 +246,6 @@ void MainWindow::save_inventory_logs_to_database() {
     db.close();
 }
 
-
-
-
-
 void MainWindow::export_inventory_logs_to_csv() {
 
     QSqlDatabase db = QSqlDatabase::database();  // Use existing connection if available
@@ -296,7 +293,6 @@ void MainWindow::export_inventory_logs_to_csv() {
 
     qDebug() << "CSV file saved successfully!";
 }
-
 
 void MainWindow::export_bills_logs_to_csv() {
 
@@ -347,8 +343,6 @@ void MainWindow::export_bills_logs_to_csv() {
     qDebug() << "CSV file saved successfully!";
 }
 
-
-
 void MainWindow::Save_Bill_Logs() {
     // Ask the user if they want to save the logs as a CSV file
     QMessageBox::StandardButton reply;
@@ -364,8 +358,6 @@ void MainWindow::Save_Bill_Logs() {
         QMessageBox::information(this, "Success", "Bill logs have been saved successfully!", QMessageBox::Ok);
     }
 }
-
-
 
 void MainWindow::Save_Inventory_Logs(){
 
@@ -383,7 +375,6 @@ void MainWindow::Save_Inventory_Logs(){
     }
 
 }
-
 
 void MainWindow::on_tabWidget_currentChanged(int index) {
     static bool preventLoop = false;

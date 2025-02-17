@@ -68,13 +68,13 @@ private slots:
 
     void About_Application();
 
-
+    // For Bill and Inventory tab Widget
     void on_tabWidget_currentChanged(int index);
 
 private:
-    bool m_preventLoop = false;
+
     Ui::MainWindow *ui;
-    Bill_manager manager; // no name when constructing [name should get as input]
+    BillManager manager; // no name when constructing [name should get as input]
 
 
 };

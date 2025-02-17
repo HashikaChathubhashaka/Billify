@@ -1,3 +1,5 @@
+// --- Function definition for bill_manager.h ---
+
 #include "Bill_manager.h"
 #include <QVector>
 
@@ -12,12 +14,12 @@
 
 
 
-Bill_manager::Bill_manager() {
+BillManager::BillManager() {
         qDebug() << "Bill manager constructor";
 }
 
 // Add item to bill and update inventory
-void Bill_manager::Add_to_Bill(int id, int Quantity) {
+void BillManager::Add_to_Bill(int id, int Quantity) {
     for (int i = 0; i < items.size(); i++) {
         if (items[i].getId() == id) {
 
@@ -48,7 +50,7 @@ void Bill_manager::Add_to_Bill(int id, int Quantity) {
 
                 items[i].setQuantity(items[i].getQuantity() - Quantity);
 
-                Bill_Item item(id, items[i].getName(), Quantity, items[i].getPrice());
+                BillItem item(id, items[i].getName(), Quantity, items[i].getPrice());
 
                 m_bill_items.append(item);
 
@@ -68,7 +70,7 @@ void Bill_manager::Add_to_Bill(int id, int Quantity) {
 }
 
 // Remove item from bill and update inventory
-void Bill_manager::Remove_from_Bill(int id, int Quantity) {
+void BillManager::Remove_from_Bill(int id, int Quantity) {
     for (int i = 0; i < m_bill_items.size(); i++) {
         if (m_bill_items[i].getID() == id) {
             if (m_bill_items[i].getQuantity() > Quantity) {
@@ -109,23 +111,23 @@ void Bill_manager::Remove_from_Bill(int id, int Quantity) {
 }
 
 
-QVector <Bill_Item> Bill_manager::Get_Bill_list(){
+QVector <BillItem> BillManager::Get_Bill_list(){
     return m_bill_items;
 }
 
-QString Bill_manager::getSaveDirectory() const{
+QString BillManager::getSaveDirectory() const{
     return m_saveDirectory;
 }
 
-QString Bill_manager::getCustomerName(){
+QString BillManager::getCustomerName(){
     return customer_name;
 }
 
 // Print bill details for debugging
-double Bill_manager::get_bill_total() {
+double BillManager::get_bill_total() {
     qDebug() << "Customer: " << customer_name;
     qDebug() << "----------------------------";
-    for (const Bill_Item &item : m_bill_items) {
+    for (const BillItem &item : m_bill_items) {
         qDebug() << "Item: " << item.getName() << " | Qty: " << item.getQuantity()
         << " | Price: $" << item.getPricePerUnit() << " | Total: $" << item.getTotalPrice();
     }
@@ -136,18 +138,18 @@ double Bill_manager::get_bill_total() {
 }
 
 
-void Bill_manager::setCustomerName(QString name){
+void BillManager::setCustomerName(QString name){
     customer_name = name;
     return;
 }
 
-void Bill_manager::setSaveDirectory(QString directory){
+void BillManager::setSaveDirectory(QString directory){
     m_saveDirectory = directory;
 
 }
 
 
-void Bill_manager::emptyingBill(){
+void BillManager::emptyingBill(){
 
     for (int i = 0; i < m_bill_items.size(); i++) {
 
@@ -166,7 +168,7 @@ void Bill_manager::emptyingBill(){
     return;
 }
 
-bool Bill_manager::generateBillPDF() {
+bool BillManager::generateBillPDF() {
 
     QString DateTimeForSaving = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss_");
 
@@ -253,7 +255,7 @@ bool Bill_manager::generateBillPDF() {
     int ItemNumber = 1;
 
     double grandTotal = 0.0;
-    for (const Bill_Item& item : m_bill_items) {
+    for (const BillItem& item : m_bill_items) {
         double totalPrice = item.getQuantity() * item.getPricePerUnit();
         grandTotal += totalPrice;
         painter.drawText(column1, yStart, QString::number(ItemNumber));
@@ -292,16 +294,16 @@ bool Bill_manager::generateBillPDF() {
     return true;
 }
 
-QString Bill_manager::getShopName(){
+QString BillManager::getShopName(){
     return m_shopName;
 }
 
-void Bill_manager::setShopName(QString shopName){
+void BillManager::setShopName(QString shopName){
     m_shopName = shopName;
 }
 
 
-void Bill_manager::generateLogsPDF(){
+void BillManager::generateLogsPDF(){
 
     QString DateTimeForSaving = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss_");
 

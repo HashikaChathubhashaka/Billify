@@ -6,13 +6,13 @@
 
 
 // since this is a small class, Define it in the header file
-class Bill_Item {
+class BillItem {
 
 
 public:
 
     // Constructor
-    explicit Bill_Item(int id, QString Name, int qty, double price)
+    explicit BillItem(int id, QString Name, int qty, double price)
         : m_ID(id), m_name(Name), m_quantity(qty), m_price_per_unit(price) {
 
         m_total_price = m_quantity * m_price_per_unit; // calculate total price of one Item when it added to bill
@@ -41,4 +41,4 @@ private:
 };
 
 
-#endif // BILL_ITEM_H
+#endif // BillItem_H

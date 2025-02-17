@@ -1,3 +1,5 @@
+// --- Function definition for item.h ---
+
 #include "Item.h"
 
 // Constructor

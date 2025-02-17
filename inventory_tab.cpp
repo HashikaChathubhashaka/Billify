@@ -1,3 +1,6 @@
+// --- MainWindow.h function definition for Inventory Tab ---
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "bill_manager.h"
@@ -13,7 +16,6 @@
 
 void MainWindow::on_addItemButton_clicked()
 {
-
 
     // Create a dialog window
     QDialog dialog(this);
@@ -121,7 +123,6 @@ void MainWindow::on_addItemButton_clicked()
 
 }
 
-
 void MainWindow::on_removeItemButton_clicked()
 {
     // Step 1: Ask for the item ID using a dialog
@@ -164,7 +165,6 @@ void MainWindow::on_removeItemButton_clicked()
     QMessageBox::warning(this, "Error", "Item ID not found in inventory!");
     return;
 }
-
 
 void MainWindow::on_editItemButton_clicked()
 {
@@ -253,7 +253,6 @@ void MainWindow::on_editItemButton_clicked()
     }
 
 }
-
 
 void MainWindow::on_undoChangesButton_clicked()
 {

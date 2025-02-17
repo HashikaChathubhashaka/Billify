@@ -1,3 +1,5 @@
+// --- Function definition for inventory manager.h ---
+
 #include "inventory_manager.h"
 #include <QFile>
 #include <QTextStream>
@@ -8,21 +10,21 @@
 #include <QVariant>
 
 // Constructor: Load data on initialization
-inventory_manager::inventory_manager() {
-    qDebug() << "inventory_manager constructor";
+InventoryManager::InventoryManager() {
+    qDebug() << "InventoryManager constructor";
 
     load_data();
 
 }
 
-inventory_manager::~inventory_manager() {
+InventoryManager::~InventoryManager() {
 
 
 }
 
 
 // Load inventory data from "data.csv"
-void inventory_manager::load_data() {
+void InventoryManager::load_data() {
 
     QSqlDatabase db = QSqlDatabase::database();  // Use existing connection if available
 
@@ -59,7 +61,7 @@ void inventory_manager::load_data() {
     qDebug() << "Data loading from SQLite completed successfully.";
 }
 
-void inventory_manager::save_data() {
+void InventoryManager::save_data() {
 
     QSqlDatabase db = QSqlDatabase::database();  // Use existing connection if available
 
@@ -142,13 +144,13 @@ void inventory_manager::save_data() {
 
 
 
-QVector <Item>& inventory_manager::getItems()  {
+QVector <Item>& InventoryManager::getItems()  {
     return items;
 
 };
 
 
-void inventory_manager::add_quantity(int id, int quantity) {
+void InventoryManager::add_quantity(int id, int quantity) {
     for (uint32_t i = 0; i < items.size(); i++) {
         if (items[i].getId() == id) {
             items[i].setQuantity(items[i].getQuantity() + quantity);
@@ -158,20 +160,20 @@ void inventory_manager::add_quantity(int id, int quantity) {
 }
 
 
-void inventory_manager::add_new_item(Item new_item){
+void InventoryManager::add_new_item(Item new_item){
     items.push_back(new_item);
     return;
 }
 
 
-void inventory_manager::remove_item_by_index(int index) {
+void InventoryManager::remove_item_by_index(int index) {
 
     items.remove(index);
 
 }
 
 
-void inventory_manager::edit_item_by_index(int index , QString new_name ,
+void InventoryManager::edit_item_by_index(int index , QString new_name ,
                                            QString new_category , QString new_supplier,
                                            int new_quantity , double new_price){
 
@@ -185,21 +187,21 @@ void inventory_manager::edit_item_by_index(int index , QString new_name ,
 }
 
 
-QVector <QString>& inventory_manager:: getInventoryLogs(){
+QVector <QString>& InventoryManager:: getInventoryLogs(){
 
     return m_inventory_logs;
 }
 
-void inventory_manager::add_item_to_inventory_log(QString log){
+void InventoryManager::add_item_to_inventory_log(QString log){
     m_inventory_logs.push_back(log);
 }
 
 
-void inventory_manager::clear_inventory_log(){
+void InventoryManager::clear_inventory_log(){
     m_inventory_logs.clear();
 }
 
-bool inventory_manager::is_inventory_log_empty(){
+bool InventoryManager::is_inventory_log_empty(){
     return m_inventory_logs.empty() ? true:false ;
 }
 
