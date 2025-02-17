@@ -1,10 +1,14 @@
-# **Billify**  
-**Windows Desktop Application for Managing Bills and Inventory**  
 
-## **Download**  
-➡ **[Download Billify Setup v1.0.0](https://github.com/HashikaChathubhashaka/Billify/releases/download/v1.0.0/Billify_1.0.0_Setup.exe)**  
+# **Billify**  
+
+![Billify Banner](https://github.com/HashikaChathubhashaka/Billify/blob/main/BilliFy.png)
+### **Windows Desktop Application for Managing Bills and Inventory**
 
 ---
+
+## **Download**  
+
+➡ **[Download Billify Setup v1.0.0 - Windows](https://github.com/HashikaChathubhashaka/Billify/releases/download/v1.0.0/Billify_1.0.0_Setup.exe)**  
 
 ## **Installation**  
 1. **Download** the latest setup file from the [Releases](https://github.com/HashikaChathubhashaka/Billify/releases) section.  
