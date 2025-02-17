@@ -28,7 +28,7 @@ If you need to backup your data, save the `database.db` file before uninstalling
 4. Generate invoices and manage billing records.  
 
 
-## ** Features**  
+## **Features**  
 ✔ **Billing Management** – Create, edit, and track bills easily.  
 ✔ **Inventory Management** – Manage product stock levels efficiently.  
 ✔ **User-Friendly UI** – Simple and intuitive interface built with Qt.  
@@ -36,7 +36,7 @@ If you need to backup your data, save the `database.db` file before uninstalling
 ✔ **Automatic Data Backup** – Easily backup and restore your database.  
 
 
-## **📄 License**  
-This project is **closed-source**. All rights reserved.   
+## License  
+This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
 
 ---
