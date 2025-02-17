@@ -28,7 +28,7 @@
  **Database Storage** – Uses SQLite for data storage.  
  **Automatic Data Backup** – Easily backup and restore your database.  
 
-## **🛠 Technologies Used**  
+## **Technologies Used**  
 - **Qt Framework (C++)** – GUI & application logic.  
 - **SQLite** – Database management.  
 - **QSettings** – Stores user preferences.
