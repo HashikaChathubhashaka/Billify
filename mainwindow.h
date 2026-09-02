@@ -3,6 +3,8 @@
 #include "bill_manager.h"
 #include <QMainWindow>
 
+// UI class
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;

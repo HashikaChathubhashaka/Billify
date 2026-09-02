@@ -4,6 +4,7 @@
 #include <QString>
 
 
+// Items that in the Make-bills section
 
 // since this is a small class, Define it in the header file
 class BillItem {

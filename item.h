@@ -3,6 +3,8 @@
 
 #include <QString> // Include for QString
 
+// Main Item class
+
 class Item {
 public:
     // Constructor

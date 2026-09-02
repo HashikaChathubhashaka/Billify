@@ -12,6 +12,11 @@
 #include <QFileDialog>
 #include <QDateTime>
 
+#include <QDebug>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+
 
 
 BillManager::BillManager() {
@@ -20,23 +25,22 @@ BillManager::BillManager() {
 
 // Add item to bill and update inventory
 void BillManager::Add_to_Bill(int id, int Quantity) {
+    int new_quantity;
+
     for (int i = 0; i < items.size(); i++) {
         if (items[i].getId() == id) {
 
-
-
-
             if (items[i].getQuantity() >= Quantity) {
 
-
                 // search for update
+                // search if the item already in the bill items vector
                 for( int x=0; x < m_bill_items.size();x++){
                     if ( m_bill_items[x].getID() == id ){
 
-
                         // have to update elements
-
-                        items[i].setQuantity(items[i].getQuantity() - Quantity); // remove from inventory
+                        new_quantity = items[i].getQuantity() - Quantity;
+                        items[i].setQuantity(new_quantity); // update the quantity --> InMemory vector
+                        queue_for_db.push_back({items[i].getId(), new_quantity});
                         m_bill_items[x].setQuantity(m_bill_items[x].getQuantity()+ Quantity); // update in Bill
 
                         //update the total price wit adding new Quantity
@@ -46,9 +50,9 @@ void BillManager::Add_to_Bill(int id, int Quantity) {
                     }
                 }
 
-
-
-                items[i].setQuantity(items[i].getQuantity() - Quantity);
+                new_quantity = items[i].getQuantity() - Quantity;
+                items[i].setQuantity(new_quantity); // update the quantity --> InMemory vector
+                queue_for_db.push_back({items[i].getId(), new_quantity}); // update the DB queue
 
                 BillItem item(id, items[i].getName(), Quantity, items[i].getPrice());
 
@@ -368,3 +372,41 @@ void BillManager::generateLogsPDF(){
     return;
 
 }
+
+void BillManager::update_DB(){
+    QSqlDatabase db = QSqlDatabase::database();  // Use existing connection if available
+
+    if (!db.isValid()) {
+        db = QSqlDatabase::addDatabase("QSQLITE");  // Only add if no existing connection
+        db.setDatabaseName("database.db");
+    }
+
+    if (!db.isOpen() && !db.open()) {
+        qDebug() << "Error: Cannot open database!" << db.lastError().text();
+        return;
+    }
+
+    QSqlQuery query;
+    query.prepare(
+        "UPDATE Inventory "
+        "SET Quantity = :quantity "
+        "WHERE ID = :id"
+        );
+
+    for (const DBItem& item : queue_for_db)
+    {
+        query.bindValue(":quantity", item.quantity);
+        query.bindValue(":id", item.ID);
+
+        if (!query.exec())
+        {
+            qDebug() << "Update failed:"
+                     << query.lastError().text();
+        }
+
+        else{
+            qDebug() << "DB update successful";
+        }
+    }
+
+};

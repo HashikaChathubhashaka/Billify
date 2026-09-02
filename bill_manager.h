@@ -7,20 +7,29 @@
 #include <QString>
 #include <QDebug>
 
+struct DBItem{
+    int ID;
+    int quantity;
+};
+
 class BillManager : public InventoryManager {
 
 private:
-    QVector<BillItem> m_bill_items; // To store the each bill Item
+    // Vector that store Items in Bill.
+    QVector<BillItem> m_bill_items;
 
     double total_price{ 0 }; // total price of the bill
     QString customer_name;
     QString m_saveDirectory;
     QString m_shopName = "My Shop"; // default
 
-public:
-
+    
+    
+    public:
+    
     BillManager();
-
+    
+    QVector <DBItem> queue_for_db;
     //setters
     void setCustomerName(QString name);
     void setSaveDirectory(QString directory);
@@ -38,6 +47,9 @@ public:
     void emptyingBill();
     bool generateBillPDF();
     void generateLogsPDF();
+
+    // updating DB
+    void update_DB();
 
     // For debugging and Get total of Bill -> Get bill Items using QDebug and returning total of bill
     double get_bill_total();

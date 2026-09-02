@@ -23,7 +23,7 @@ InventoryManager::~InventoryManager() {
 }
 
 
-// Load inventory data from "data.csv"
+// Load inventory data from DB
 void InventoryManager::load_data() {
 
     QSqlDatabase db = QSqlDatabase::database();  // Use existing connection if available

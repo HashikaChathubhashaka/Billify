@@ -1,6 +1,7 @@
 #ifndef INVENTORY_MANAGER_H
 #define INVENTORY_MANAGER_H
 
+// Class reference to edit inventory section
 
 #include "Item.h"
 
@@ -14,7 +15,9 @@ class InventoryManager {
 
 protected:
 
+    // Main Item Vector - Store Items as in-memory data
     QVector<Item> items;
+
     QString m_loadDirectory;
     QVector <QString> m_inventory_logs;
 
