@@ -285,7 +285,6 @@ void MainWindow::on_saveChangesButton_clicked()
 
     }
     updateInventoryTable();
-    //manager.save_data(); // update inventory table in database [inventory Vector -> update the database table]
     manager.update_DB_with_new_inventory_queries();
     manager.clear_inventory_log();
     ui->logTextEdit->clear();

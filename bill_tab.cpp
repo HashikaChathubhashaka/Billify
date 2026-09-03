@@ -158,15 +158,6 @@ void MainWindow::processBill()
 
     }
 
-    // -- debug --
-    // for (const DBItem& item : manager.queue_for_db)
-    // {
-    //     qDebug() << "Item ID:" << item.ID
-    //              << "Quantity:" << item.quantity;
-    // }
-    // Save inventory data
-    //manager.save_data();
-
     manager.update_DB();
 
     // Reset the manager object

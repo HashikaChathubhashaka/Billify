@@ -48,7 +48,6 @@ public:
 
     // load and save data to DB
     void load_data();
-    void save_data();
 
     void update_DB_with_new_inventory_queries();
 
