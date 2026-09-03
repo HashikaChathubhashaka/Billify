@@ -23,13 +23,13 @@ private:
     QString m_saveDirectory;
     QString m_shopName = "My Shop"; // default
 
-    
-    
+    // Store Item and Quantity details for updating the DB.
+    QVector <DBItem> queue_for_db;
+
     public:
     
     BillManager();
-    
-    QVector <DBItem> queue_for_db;
+
     //setters
     void setCustomerName(QString name);
     void setSaveDirectory(QString directory);

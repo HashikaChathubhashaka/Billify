@@ -151,10 +151,12 @@ void MainWindow::on_removeItemButton_clicked()
 
                 ;
 
-        manager.add_item_to_inventory_log(removedItemLog);
+            manager.add_item_to_inventory_log(removedItemLog);
 
 
             ui->logTextEdit->append(removedItemLog);
+
+            manager.add_remove_item_to_db_query(items[i]);
             manager.remove_item_by_index(i);
             QMessageBox::information(this, "Success", "Item removed successfully!");
             return;
@@ -242,9 +244,19 @@ void MainWindow::on_editItemButton_clicked()
                                  .arg(priceEdit.text().toDouble(), 0, 'f', 2)
                                  .arg(categoryEdit.text())
                                  .arg(supplierEdit.text());
-
+       
         manager.edit_item_by_index(index,nameEdit.text(),categoryEdit.text() ,supplierEdit.text() ,
                                    quantityEdit.text().toInt() ,priceEdit.text().toDouble());
+        
+        Item updated_item = Item(
+            itemId,
+            nameEdit.text(),
+            quantityEdit.text().toInt(),
+            priceEdit.text().toDouble(),
+            categoryEdit.text(),
+            supplierEdit.text()
+            );
+        manager.add_edit_item_to_db_query(updated_item);
 
         ui->logTextEdit->append(logMessage);
         manager.add_item_to_inventory_log(logMessage);
@@ -273,7 +285,8 @@ void MainWindow::on_saveChangesButton_clicked()
 
     }
     updateInventoryTable();
-    manager.save_data(); // update inventory table in database [inventory Vector -> update the database table]
+    //manager.save_data(); // update inventory table in database [inventory Vector -> update the database table]
+    manager.update_DB_with_new_inventory_queries();
     manager.clear_inventory_log();
     ui->logTextEdit->clear();
 

@@ -9,11 +9,23 @@
 #include <QSqlError>
 #include <QVariant>
 
-// Constructor: Load data on initialization
+// Constructor:  data on initialization
 InventoryManager::InventoryManager() {
     qDebug() << "InventoryManager constructor";
 
     load_data();
+
+    QSqlDatabase db = QSqlDatabase::database();  // Use existing connection if available
+
+    if (!db.isValid()) {
+        db = QSqlDatabase::addDatabase("QSQLITE");  // Only add if no existing connection
+        db.setDatabaseName("database.db");
+    }
+
+    if (!db.isOpen() && !db.open()) {
+        qDebug() << "Error: Cannot open database!" << db.lastError().text();
+        return;
+    }
 
 }
 
@@ -54,11 +66,11 @@ void InventoryManager::load_data() {
         Item item(id, name, quantity, price, category, supplier);
         items.push_back(item);
 
-        qDebug() << "Loaded item:" << id << name << quantity << price << category << supplier;
+        qDebug() << "ed item:" << id << name << quantity << price << category << supplier;
     }
 
     db.close();
-    qDebug() << "Data loading from SQLite completed successfully.";
+    qDebug() << "Data ing from SQLite completed successfully.";
 }
 
 void InventoryManager::save_data() {
@@ -159,20 +171,40 @@ void InventoryManager::add_quantity(int id, int quantity) {
     }
 }
 
-
+// For DB + in-memory
 void InventoryManager::add_new_item(Item new_item){
+    // add item into In-memory vector
     items.push_back(new_item);
+
+    DB_queries_saver.push_back({
+        ChangeTypeForDB::Added ,
+        new_item
+    });
+
+
+
     return;
 }
 
-
+// For in-memory
 void InventoryManager::remove_item_by_index(int index) {
 
+    // remove item from in-memory
     items.remove(index);
 
 }
 
+// For DB
+void InventoryManager::add_remove_item_to_db_query(Item item){
+    
+    DB_queries_saver.push_back({
+        ChangeTypeForDB::Deleted,
+        item
+    });
 
+};
+
+// For in-memory
 void InventoryManager::edit_item_by_index(int index , QString new_name ,
                                            QString new_category , QString new_supplier,
                                            int new_quantity , double new_price){
@@ -185,6 +217,125 @@ void InventoryManager::edit_item_by_index(int index , QString new_name ,
 
 
 }
+
+// For DB
+void InventoryManager::add_edit_item_to_db_query(Item updated_item){
+    DB_queries_saver.push_back({
+        ChangeTypeForDB::Modified,
+        updated_item
+    });
+
+}
+
+// completed for both Delete, Add and Modify
+// need to edit  -> (when DB is structure is change and then sql querue need to change)
+void  InventoryManager::update_DB_with_new_inventory_queries(){
+        
+            QSqlDatabase db = QSqlDatabase::database();
+
+            for (const auto& change : DB_queries_saver)
+            {
+                switch (change.type)
+                {
+                    case ChangeTypeForDB::Deleted:  // DELETE
+                    {
+                        QSqlQuery query(db);
+
+                        query.prepare("DELETE FROM Inventory WHERE ID = :id");
+                        query.bindValue(":id", change.item.getId());
+
+                        if (!query.exec())
+                        {
+                            qDebug() << "Error: Failed to delete item!"
+                                    << query.lastError().text();
+                        }
+                        else
+                        {
+                            qDebug() << "Deleted item:"
+                                    << change.item.getId()
+                                    << change.item.getName();
+                        }
+
+                        break;
+                    }
+
+                    // Added and Modified will go here later
+
+                    case ChangeTypeForDB::Added: // INSERT
+                    {
+                        QSqlQuery query(db);
+
+                        query.prepare(
+                            "INSERT INTO Inventory "
+                            "(ID, Name, Quantity, Price, Category, Supplier) "
+                            "VALUES (:id, :name, :quantity, :price, :category, :supplier)"
+                        );
+
+                        query.bindValue(":id", change.item.getId());
+                        query.bindValue(":name", change.item.getName());
+                        query.bindValue(":quantity", change.item.getQuantity());
+                        query.bindValue(":price", change.item.getPrice());
+                        query.bindValue(":category", change.item.getCategory());
+                        query.bindValue(":supplier", change.item.getSupplier());
+
+                        if (!query.exec())
+                        {
+                            qDebug() << "Error: Failed to add item!"
+                                    << query.lastError().text();
+                        }
+                        else
+                        {
+                            qDebug() << "Added item:"
+                                    << change.item.getId()
+                                    << change.item.getName();
+                        }
+
+                        break;
+                    }
+
+
+                    case ChangeTypeForDB::Modified:
+                    {
+                        QSqlQuery query(db);
+
+                        query.prepare(
+                            "UPDATE Inventory SET "
+                            "Name = :name, "
+                            "Quantity = :quantity, "
+                            "Price = :price, "
+                            "Category = :category, "
+                            "Supplier = :supplier "
+                            "WHERE ID = :id"
+                        );
+
+                        query.bindValue(":id", change.item.getId());
+                        query.bindValue(":name", change.item.getName());
+                        query.bindValue(":quantity", change.item.getQuantity());
+                        query.bindValue(":price", change.item.getPrice());
+                        query.bindValue(":category", change.item.getCategory());
+                        query.bindValue(":supplier", change.item.getSupplier());
+
+                        if (!query.exec())
+                        {
+                            qDebug() << "Error: Failed to update item!"
+                                    << query.lastError().text();
+                        }
+                        else
+                        {
+                            qDebug() << "Updated item:"
+                                    << change.item.getId()
+                                    << change.item.getName();
+                        }
+
+                        break;
+                    }
+                }
+
+    
+            }
+
+            DB_queries_saver.clear();
+    }
 
 
 QVector <QString>& InventoryManager:: getInventoryLogs(){
