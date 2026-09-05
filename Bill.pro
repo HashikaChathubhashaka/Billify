@@ -15,6 +15,7 @@ SOURCES += \
     bill_manager.cpp \
     bill_tab.cpp \
     inventory_manager.cpp \
+    inventory_repository.cpp \
     inventory_tab.cpp \
     inventory_table.cpp \
     item.cpp \
@@ -25,6 +26,7 @@ HEADERS += \
     bill_item.h \
     bill_manager.h \
     inventory_manager.h \
+    inventory_repository.h \
     item.h \
     mainwindow.h
 

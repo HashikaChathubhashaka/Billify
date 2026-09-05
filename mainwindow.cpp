@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->searchNameLineEdit, &QLineEdit::textChanged, this, &MainWindow::filterItems);
     // By ID
     connect(ui->searchIDLineEdit, &QLineEdit::textChanged,this , &MainWindow::filterByID);
+    // By barcode
+    connect(ui->searchBarcodeLineEdit, &QLineEdit::textChanged, this, &MainWindow::filterByBarcode);
 
     //select from Inventory list - double clicked inventory item
     connect(ui->outputTableWidget, &QTableWidget::cellDoubleClicked, this, &MainWindow::on_inventoryItemClicked);
@@ -60,42 +62,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    // inventory Table initilize
-    ui->outputTableWidget->clear(); // Clear previous data
-    ui->outputTableWidget->setRowCount(manager.getItems().size()); // Set rows dynamically
-    ui->outputTableWidget->setColumnCount(6); // Have 6 columns
-
-    // Set table headers
-    QStringList Inventory_headers = {"ID", "Name", "Quantity", "Price", "Category", "Supplier"};
-    ui->outputTableWidget->setHorizontalHeaderLabels(Inventory_headers);
-
-    // Inventory Table
-    for (uint8_t row = 0; row < manager.getItems().size(); ++row) {
-        const Item& item = manager.getItems().at(row);
-
-        QTableWidgetItem* idItem = new QTableWidgetItem(QString::number(item.getId()));
-        QTableWidgetItem* nameItem = new QTableWidgetItem(item.getName());
-        QTableWidgetItem* quantityItem = new QTableWidgetItem(QString::number(item.getQuantity()));
-        QTableWidgetItem* priceItem = new QTableWidgetItem(QString::number(item.getPrice(), 'f', 2)); // 2 decimal places
-        QTableWidgetItem* categoryItem = new QTableWidgetItem(item.getCategory());
-        QTableWidgetItem* supplierItem = new QTableWidgetItem(item.getSupplier());
-
-        //  Set items as read-only
-        idItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        quantityItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        priceItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        categoryItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        supplierItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-
-        //  Add items to table
-        ui->outputTableWidget->setItem(row, 0, idItem);
-        ui->outputTableWidget->setItem(row, 1, nameItem);
-        ui->outputTableWidget->setItem(row, 2, quantityItem);
-        ui->outputTableWidget->setItem(row, 3, priceItem);
-        ui->outputTableWidget->setItem(row, 4, categoryItem);
-        ui->outputTableWidget->setItem(row, 5, supplierItem);
-    }
+    // Inventory table is populated by the shared renderer after startup.
+    updateInventoryTable();
 
     // Ensure proper display settings
     ui->outputTableWidget->setShowGrid(true);

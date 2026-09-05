@@ -40,7 +40,7 @@ protected:
 
 public:
 
-    QVector < InventoryChangesForDB> DB_queries_saver;
+    QVector < InventoryChangesForDB> DB_updates_saver;
 
      InventoryManager(); // When making inventory manager object, data are load.
     ~InventoryManager();
@@ -55,13 +55,15 @@ public:
 
 
     // Function for changing items vector + DB
-    void add_quantity(int id, int quantity);   // update quantity of exsisting item - useful when item is remove from bill
+    void add_quantity(int id, double quantity);   // update quantity of existing item
 
     void add_new_item(Item new_item); // adding to both in-memory vector and DB query vector
 
     void remove_item_by_index(int index);
-    void edit_item_by_index(int index , QString new_name , QString new_category , QString new_supplier, int new_quantity , double new_price);
+    void edit_item_by_index(int index, QString new_name, double new_quantity,
+                            Unit new_unit, double new_price);
 
+    void add_new_item_to_db_query(Item item);
     void add_remove_item_to_db_query(Item item);
     void add_edit_item_to_db_query(Item updated_item);
 

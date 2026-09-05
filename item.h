@@ -5,33 +5,49 @@
 
 // Main Item class
 
+enum class Unit : int
+{
+    Piece = 0,
+    Kilogram = 1,
+    Meter = 2
+};
+
+
+
 class Item {
 public:
     // Constructor
-    Item(int id, const QString& name, int quantity, double price, const QString& category, const QString& supplier);
+    Item(int id, const QString& name, 
+        double quantity, Unit unitType ,
+        double price, const QString& barcode
+        );
 
     // Getters
     int getId() const;
     QString getName() const;
-    int getQuantity() const;
+    double getQuantity() const;
     double getPrice() const;
-    QString getCategory() const;
-    QString getSupplier() const;
+    QString getBarcode() const;
+    Unit getUnit() const;
+
 
     // Setters
     void setName(QString name);
-    void setCategory(QString category);
-    void setSupplier(QString supplier);
-    void setQuantity(int qty);
+    void setBarcode(QString barcode);
+    void setQuantity(double qty);
     void setPrice(double p);
+    void setUnit(Unit unit);
+
 
 private:
-    int m_id; // ID is taken as int
-    QString m_name;
-    int m_quantity;
-    double m_price;
-    QString m_category;
-    QString m_supplier;
+    int m_id; // (PK)
+    QString m_name; // (NN)
+    double m_quantity; // (NN)
+    double m_price; // per quantity price (NN)
+    QString m_barcode; 
+    Unit m_unitType; // (NN)
+
+
 };
 
 #endif // ITEM_H

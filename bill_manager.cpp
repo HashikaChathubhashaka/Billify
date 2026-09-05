@@ -24,8 +24,8 @@ BillManager::BillManager() {
 }
 
 // Add item to bill and update inventory
-void BillManager::Add_to_Bill(int id, int Quantity) {
-    int new_quantity;
+void BillManager::Add_to_Bill(int id, double Quantity) {
+    double new_quantity;
 
     for (int i = 0; i < items.size(); i++) {
         if (items[i].getId() == id) {
@@ -74,7 +74,7 @@ void BillManager::Add_to_Bill(int id, int Quantity) {
 }
 
 // Remove item from bill and update inventory
-void BillManager::Remove_from_Bill(int id, int Quantity) {
+void BillManager::Remove_from_Bill(int id, double Quantity) {
     for (int i = 0; i < m_bill_items.size(); i++) {
         if (m_bill_items[i].getID() == id) {
             if (m_bill_items[i].getQuantity() > Quantity) {

@@ -12,6 +12,9 @@
 #include <QDesktopServices>
 #include <QSettings>
 #include <QFormLayout>
+#include <QComboBox>
+#include <QDoubleSpinBox>
+#include <QtMath>
 
 
 void MainWindow::on_addItemButton_clicked()
@@ -26,27 +29,43 @@ void MainWindow::on_addItemButton_clicked()
     QVBoxLayout layout(&dialog);
 
     // Create input fields
-    QLineEdit idField, nameField, quantityField, priceField, categoryField, supplierField;
+    QLineEdit idField, nameField, barcodeField;
+    QDoubleSpinBox quantityField, priceField;
+    QComboBox unitField;
     idField.setPlaceholderText("Enter ID");
     nameField.setPlaceholderText("Enter Name");
-    quantityField.setPlaceholderText("Enter Quantity");
-    priceField.setPlaceholderText("Enter Price");
-    categoryField.setPlaceholderText("Enter Category");
-    supplierField.setPlaceholderText("Enter Supplier");
+    quantityField.setRange(0, 1000000000);
+    quantityField.setDecimals(3);
+    quantityField.setSingleStep(0.001);
+    priceField.setRange(0, 1000000000);
+    priceField.setDecimals(2);
+    unitField.addItem("Piece", static_cast<int>(Unit::Piece));
+    unitField.addItem("Kilogram", static_cast<int>(Unit::Kilogram));
+    unitField.addItem("Meter", static_cast<int>(Unit::Meter));
+    barcodeField.setPlaceholderText("Enter Barcode");
 
     // Add fields to layout
     layout.addWidget(new QLabel("Item ID:"));
     layout.addWidget(&idField);
     layout.addWidget(new QLabel("Item Name:"));
     layout.addWidget(&nameField);
+    layout.addWidget(new QLabel("Unit:"));
+    layout.addWidget(&unitField);
     layout.addWidget(new QLabel("Quantity:"));
     layout.addWidget(&quantityField);
     layout.addWidget(new QLabel("Price:"));
     layout.addWidget(&priceField);
-    layout.addWidget(new QLabel("Category:"));
-    layout.addWidget(&categoryField);
-    layout.addWidget(new QLabel("Supplier:"));
-    layout.addWidget(&supplierField);
+    layout.addWidget(new QLabel("Barcode:"));
+    layout.addWidget(&barcodeField);
+
+    connect(&unitField, qOverload<int>(&QComboBox::currentIndexChanged), [&](int) {
+        const bool isPiece = unitField.currentData().toInt() == static_cast<int>(Unit::Piece);
+        quantityField.setDecimals(isPiece ? 0 : 3);
+        quantityField.setSingleStep(isPiece ? 1 : 0.001);
+        if (isPiece) {
+            quantityField.setValue(qFloor(quantityField.value()));
+        }
+    });
 
     // Add buttons
     QPushButton addButton("Add Item"), cancelButton("Cancel");
@@ -61,26 +80,22 @@ void MainWindow::on_addItemButton_clicked()
         // Get input values
         QString idText = idField.text();
         QString name = nameField.text();
-        QString quantityText = quantityField.text();
-        QString priceText = priceField.text();
-        QString category = categoryField.text();
-        QString supplier = supplierField.text();
+        double quantity = quantityField.value();
+        double price = priceField.value();
+        Unit unit = static_cast<Unit>(unitField.currentData().toInt());
 
         // Validation: Check for empty fields
-        if (idText.isEmpty() || name.isEmpty() || quantityText.isEmpty() ||
-            priceText.isEmpty() || category.isEmpty() || supplier.isEmpty()) {
+        if (idText.isEmpty() || name.isEmpty()) {
             QMessageBox::warning(&dialog, "Error", "All fields must be filled!");
             return;
         }
 
         // Convert values
-        bool idOk, quantityOk, priceOk;
+        bool idOk;
         int id = idText.toInt(&idOk);
-        int quantity = quantityText.toInt(&quantityOk);
-        double price = priceText.toDouble(&priceOk);
 
         // Validate number conversions
-        if (!idOk || !quantityOk || !priceOk) {
+        if (!idOk || quantity < 0 || price < 0) {
             QMessageBox::warning(&dialog, "Error", "Invalid numeric values!");
             return;
         }
@@ -94,17 +109,18 @@ void MainWindow::on_addItemButton_clicked()
         }
 
         // Add new item
-        manager.add_new_item(Item(id, name, quantity, price, category, supplier));
+        Item new_item(id, name, quantity, unit, price, barcodeField.text());
+        manager.add_new_item(new_item);
+        manager.add_new_item_to_db_query(new_item);
 
 
         //  Store item details for logging
-        QString addItemLog = QString("Item ID: %1 | Name: %2 | Qty: %3 | Price: %4 | Cat: %5 | Supplier: %6 , has been added.\n")
+        QString addItemLog = QString("Item ID: %1 | Name: %2 | Unit: %3 | Qty: %4 | Price: %5, has been added.\n")
                                      .arg(id)
                                      .arg(name)
-                                     .arg(quantity)
-                                     .arg(price)
-                                     .arg(category)
-                                     .arg(supplier);
+                         .arg(unitField.currentText())
+                         .arg(quantity)
+                         .arg(price);
 
         QMessageBox::information(&dialog, "Success", "Item added successfully!");
         manager.add_item_to_inventory_log(addItemLog);
@@ -141,13 +157,11 @@ void MainWindow::on_removeItemButton_clicked()
 
 
             //  Store item details for logging
-            QString removedItemLog = QString("Item ID: %1 | Name: %2 | Qty: %3 | Price: %4 | Cat: %5 | Supplier: %6 , has been removed.\n")
+            QString removedItemLog = QString("Item ID: %1 | Name: %2 | Qty: %3 | Price: %4, has been removed.\n")
                                          .arg(items[i].getId())
                                          .arg(items[i].getName())
                                          .arg(items[i].getQuantity())
-                                         .arg(items[i].getPrice())
-                                         .arg(items[i].getCategory())
-                                         .arg(items[i].getSupplier());
+                                         .arg(items[i].getPrice());
 
                 ;
 
@@ -200,16 +214,31 @@ void MainWindow::on_editItemButton_clicked()
     QFormLayout form(&dialog);
 
     QLineEdit nameEdit(items[index].getName(), &dialog);
-    QLineEdit categoryEdit(items[index].getCategory(), &dialog);
-    QLineEdit supplierEdit(items[index].getSupplier(), &dialog);
-    QLineEdit quantityEdit(QString::number(items[index].getQuantity()), &dialog);
-    QLineEdit priceEdit(QString::number(items[index].getPrice(), 'f', 2), &dialog);
+    QComboBox unitEdit(&dialog);
+    unitEdit.addItem("Piece", static_cast<int>(Unit::Piece));
+    unitEdit.addItem("Kilogram", static_cast<int>(Unit::Kilogram));
+    unitEdit.addItem("Meter", static_cast<int>(Unit::Meter));
+    unitEdit.setCurrentIndex(unitEdit.findData(static_cast<int>(items[index].getUnit())));
+    QDoubleSpinBox quantityEdit(&dialog);
+    quantityEdit.setRange(0, 1000000000);
+    quantityEdit.setDecimals(items[index].getUnit() == Unit::Piece ? 0 : 3);
+    quantityEdit.setValue(items[index].getQuantity());
+    QDoubleSpinBox priceEdit(&dialog);
+    priceEdit.setRange(0, 1000000000);
+    priceEdit.setDecimals(2);
+    priceEdit.setValue(items[index].getPrice());
+    QLineEdit barcodeEdit(items[index].getBarcode(), &dialog);
 
     form.addRow("Name:", &nameEdit);
-    form.addRow("Category:", &categoryEdit);
-    form.addRow("Supplier:", &supplierEdit);
+    form.addRow("Unit:", &unitEdit);
     form.addRow("Quantity:", &quantityEdit);
     form.addRow("Price:", &priceEdit);
+    form.addRow("Barcode:", &barcodeEdit);
+    connect(&unitEdit, qOverload<int>(&QComboBox::currentIndexChanged), [&](int) {
+        const bool isPiece = unitEdit.currentData().toInt() == static_cast<int>(Unit::Piece);
+        quantityEdit.setDecimals(isPiece ? 0 : 3);
+        if (isPiece) quantityEdit.setValue(qFloor(quantityEdit.value()));
+    });
 
     // // Step 5: Add buttons
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
@@ -220,8 +249,7 @@ void MainWindow::on_editItemButton_clicked()
     // Step 6: Show the dialog
     if (dialog.exec() == QDialog::Accepted) {
         // Validate input
-        if (nameEdit.text().isEmpty() || categoryEdit.text().isEmpty() || supplierEdit.text().isEmpty() ||
-            quantityEdit.text().isEmpty() || priceEdit.text().isEmpty()) {
+        if (nameEdit.text().isEmpty()) {
             QMessageBox::warning(this, "Error", "All fields must be filled!");
             return;
         }
@@ -230,31 +258,28 @@ void MainWindow::on_editItemButton_clicked()
 
 
 
-        QString beforeUpdate = QString("Item ID: %1 | Name: %2 | Qty: %3 | Price: %4 | Cat: %5 | Supplier: %6 , has been updated to: ")
+        QString beforeUpdate = QString("Item ID: %1 | Name: %2 | Qty: %3 | Price: %4, has been updated to: ")
                                      .arg(items[index].getId())
                                      .arg(items[index].getName())
                                      .arg(items[index].getQuantity())
-                                     .arg(items[index].getPrice() , 0, 'f', 2)
-                                     .arg(items[index].getCategory())
-                                     .arg(items[index].getSupplier());
+                         .arg(items[index].getPrice() , 0, 'f', 2);
         //Log the edit action
-        QString logMessage = QString(beforeUpdate + " Name: %2 | Qty: %3 | Price: %4 | Cat: %5 | Supplier: %6 . \n")
+        QString logMessage = QString(beforeUpdate + " Name: %2 | Unit: %3 | Qty: %4 | Price: %5 . \n")
                                  .arg(nameEdit.text())
-                                 .arg(quantityEdit.text().toInt())
-                                 .arg(priceEdit.text().toDouble(), 0, 'f', 2)
-                                 .arg(categoryEdit.text())
-                                 .arg(supplierEdit.text());
+                     .arg(unitEdit.currentText())
+                     .arg(quantityEdit.value())
+                     .arg(priceEdit.value(), 0, 'f', 2);
        
-        manager.edit_item_by_index(index,nameEdit.text(),categoryEdit.text() ,supplierEdit.text() ,
-                                   quantityEdit.text().toInt() ,priceEdit.text().toDouble());
+        Unit unit = static_cast<Unit>(unitEdit.currentData().toInt());
+        manager.edit_item_by_index(index, nameEdit.text(), quantityEdit.value(), unit, priceEdit.value());
         
         Item updated_item = Item(
             itemId,
             nameEdit.text(),
-            quantityEdit.text().toInt(),
-            priceEdit.text().toDouble(),
-            categoryEdit.text(),
-            supplierEdit.text()
+            quantityEdit.value(),
+            unit,
+            priceEdit.value(),
+            barcodeEdit.text()
             );
         manager.add_edit_item_to_db_query(updated_item);
 

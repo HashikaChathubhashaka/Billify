@@ -26,6 +26,7 @@ private slots:
 
     void filterItems();
     void filterByID();
+    void filterByBarcode();
     void on_inventoryItemClicked(int row);
     void updateInventoryTable(); // updating visible inventory table according to Qvector (not from stored data)
     void on_RefreshButton_clicked();

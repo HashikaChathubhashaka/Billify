@@ -43,6 +43,19 @@ void MainWindow::filterByID()
     }
 }
 
+void MainWindow::filterByBarcode()
+{
+    QString searchText = ui->searchBarcodeLineEdit->text();
+
+    for (int row = 0; row < ui->outputTableWidget->rowCount(); ++row) {
+        QTableWidgetItem* item = ui->outputTableWidget->item(row, 5); // Barcode column
+        if (item) {
+            bool match = item->text().contains(searchText, Qt::CaseInsensitive);
+            ui->outputTableWidget->setRowHidden(row, !match);
+        }
+    }
+}
+
 
 void MainWindow::on_inventoryItemClicked(int row) {
     if (ui->tabWidget->currentIndex() == 0){
@@ -57,9 +70,12 @@ void MainWindow::on_inventoryItemClicked(int row) {
 
         // Ask for quantity input
         bool ok;
-        int quantity = QInputDialog::getInt(this, "Enter Quantity",
-                                            "Enter quantity for add " + itemName + ":",
-                                            1, 1, selectedItem.getQuantity(), 1, &ok);
+        double quantity = QInputDialog::getDouble(this, "Enter Quantity",
+                              "Enter quantity for add " + itemName + ":",
+                              selectedItem.getUnit() == Unit::Piece ? 1 : 0.001,
+                              selectedItem.getUnit() == Unit::Piece ? 1 : 0.001,
+                              selectedItem.getQuantity(),
+                              selectedItem.getUnit() == Unit::Piece ? 0 : 3, &ok);
 
         if (ok) { // If user pressed OK
             manager.Add_to_Bill(itemId, quantity); // Add item to bill item vector (add item to bill)
@@ -84,7 +100,7 @@ void MainWindow::updateInventoryTable(){
     ui->outputTableWidget->setColumnCount(6); // Have 6 columns
 
     // Set table headers
-    QStringList Inventory_headers = {"ID", "Name", "Quantity", "Price", "Category", "Supplier"};
+    QStringList Inventory_headers = {"ID", "Name", "Unit", "Quantity", "Price", "Barcode"};
     ui->outputTableWidget->setHorizontalHeaderLabels(Inventory_headers);
 
     // Inventory Table
@@ -93,26 +109,26 @@ void MainWindow::updateInventoryTable(){
 
         QTableWidgetItem* idItem = new QTableWidgetItem(QString::number(item.getId()));
         QTableWidgetItem* nameItem = new QTableWidgetItem(item.getName());
+        QTableWidgetItem* unitItem = new QTableWidgetItem(item.getUnit() == Unit::Piece ? "Piece" : item.getUnit() == Unit::Kilogram ? "Kilogram" : "Meter");
         QTableWidgetItem* quantityItem = new QTableWidgetItem(QString::number(item.getQuantity()));
-        QTableWidgetItem* priceItem = new QTableWidgetItem(QString::number(item.getPrice(), 'f', 2)); // 2 decimal places
-        QTableWidgetItem* categoryItem = new QTableWidgetItem(item.getCategory());
-        QTableWidgetItem* supplierItem = new QTableWidgetItem(item.getSupplier());
+        QTableWidgetItem* priceItem = new QTableWidgetItem(QString::number(item.getPrice(), 'f', 2));
+        QTableWidgetItem* barcodeItem = new QTableWidgetItem(item.getBarcode());
 
         //  Set items as read-only
         idItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         quantityItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         priceItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        categoryItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        supplierItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        unitItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        barcodeItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
         //  Add items to table
         ui->outputTableWidget->setItem(row, 0, idItem);
         ui->outputTableWidget->setItem(row, 1, nameItem);
-        ui->outputTableWidget->setItem(row, 2, quantityItem);
-        ui->outputTableWidget->setItem(row, 3, priceItem);
-        ui->outputTableWidget->setItem(row, 4, categoryItem);
-        ui->outputTableWidget->setItem(row, 5, supplierItem);
+        ui->outputTableWidget->setItem(row, 2, unitItem);
+        ui->outputTableWidget->setItem(row, 3, quantityItem);
+        ui->outputTableWidget->setItem(row, 4, priceItem);
+        ui->outputTableWidget->setItem(row, 5, barcodeItem);
     }
 
 }

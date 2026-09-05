@@ -9,7 +9,7 @@
 
 struct DBItem{
     int ID;
-    int quantity;
+    double quantity;
 };
 
 class BillManager : public InventoryManager {
@@ -42,8 +42,8 @@ private:
     QString getShopName();
 
     // Bill Functionalities
-    void Add_to_Bill(int id, int Quantity = 1);
-    void Remove_from_Bill(int id, int Quantity = 1);
+    void Add_to_Bill(int id, double Quantity = 1);
+    void Remove_from_Bill(int id, double Quantity = 1);
     void emptyingBill();
     bool generateBillPDF();
     void generateLogsPDF();

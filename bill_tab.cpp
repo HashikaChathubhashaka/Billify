@@ -6,6 +6,7 @@
 #include "bill_manager.h"
 #include <QInputDialog>  // For user input dialog
 #include <QMessageBox>   // For error messages
+#include <QtMath>
 #include <qfiledialog.h>
 #include <cstdint>
 #include <QStandardPaths>
@@ -68,9 +69,13 @@ void MainWindow::on_BillItemClicked(int row) {
 
     // Ask for quantity input
     bool ok;
-    int quantity = QInputDialog::getInt(this, "Enter Quantity",
-                                        "Enter quantity for remove " + itemName + ":",
-                                        1, 1, selectedItem.getQuantity(), 1, &ok);
+    double quantity = QInputDialog::getDouble(this, "Enter Quantity",
+                                              "Enter quantity for remove " + itemName + ":",
+                                              selectedItem.getQuantity() >= 1 ? 1 : selectedItem.getQuantity(),
+                                              selectedItem.getQuantity() > 0 ? 0.001 : 0,
+                                              selectedItem.getQuantity(),
+                                              selectedItem.getQuantity() == qFloor(selectedItem.getQuantity()) ? 0 : 3,
+                                              &ok);
 
     if (ok) { // If user pressed OK
         manager.Remove_from_Bill(itemId, quantity); // Add item to bill
